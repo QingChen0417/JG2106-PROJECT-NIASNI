@@ -101,6 +101,7 @@ public class SpringShiroConfig {
 	public SessionManager sessionManager() {
 		DefaultWebSessionManager sManager= new DefaultWebSessionManager();
 		sManager.setGlobalSessionTimeout(60*60*1000);//毫秒
+		System.out.println(sManager);
 		return sManager;
 	}
 }
