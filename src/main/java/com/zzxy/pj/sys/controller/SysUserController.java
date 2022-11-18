@@ -56,10 +56,11 @@ public class SysUserController {
 	
 	@RequestMapping("doLogin")
 	@RequireLog("登录操作")
-	public JsonResult doLogin(String username, String password) {
+	public JsonResult doLogin(String username, String password, boolean isRememberMe) {
 		//当SecurityManager创建对象时在构造方法中设置了Subject对象
 		Subject subject = SecurityUtils.getSubject();
 		UsernamePasswordToken token = new UsernamePasswordToken(username, password);
+		token.setRememberMe(isRememberMe);
 		subject.login(token);
 		return new JsonResult("登录成功");
 	}

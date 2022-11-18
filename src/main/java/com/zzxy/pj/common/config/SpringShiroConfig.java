@@ -5,11 +5,14 @@ import java.util.Map;
 
 import org.apache.shiro.cache.CacheManager;
 import org.apache.shiro.cache.MemoryConstrainedCacheManager;
+import org.apache.shiro.mgt.RememberMeManager;
 import org.apache.shiro.mgt.SecurityManager;
 import org.apache.shiro.realm.Realm;
 import org.apache.shiro.spring.security.interceptor.AuthorizationAttributeSourceAdvisor;
 import org.apache.shiro.spring.web.ShiroFilterFactoryBean;
+import org.apache.shiro.web.mgt.CookieRememberMeManager;
 import org.apache.shiro.web.mgt.DefaultWebSecurityManager;
+import org.apache.shiro.web.servlet.SimpleCookie;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
@@ -18,11 +21,11 @@ import at.pollux.thymeleaf.shiro.dialect.ShiroDialect;
 @Configuration//当作配置文件类
 public class SpringShiroConfig {
 
-	//@Bean注解会把方法的返回值对象交给容器管理, id为方法名
+	/*//@Bean注解会把方法的返回值对象交给容器管理, id为方法名
 	@Bean
 	public SecurityManager securityManager() {
 		return new DefaultWebSecurityManager();
-	}
+	}*/
 
 	@Bean
 	public ShiroFilterFactoryBean  shiroFilterFactoryBean(SecurityManager securityManager) {
@@ -45,19 +48,20 @@ public class SpringShiroConfig {
 		map.put("/plugins/**","anon");
 		map.put("/user/doLogin","anon");
 		//配置退出登录路径
-		map.put("/doLoginOut", "logout");
+		map.put("/doLoginOut", "logout");//logout表示退出
 		//除了匿名访问的资源,其它都要认证("authc")后访问
-		map.put("/**","authc");
+		map.put("/**","user");//记住我功能一定要改成user
 		//设置到shiro的过滤器中
 		shiroFilter.setFilterChainDefinitionMap(map);
 		return shiroFilter;
 	}
 
 	@Bean
-	public SecurityManager securityManager(Realm realm, CacheManager cacheManager) {
+	public SecurityManager securityManager(Realm realm, CacheManager cacheManager, RememberMeManager rememberMeManager) {
 		DefaultWebSecurityManager sManager = new DefaultWebSecurityManager();
 		sManager.setRealm(realm);
 		sManager.setCacheManager(cacheManager);
+		sManager.setRememberMeManager(rememberMeManager);
 		return sManager;
 	}
 
@@ -81,6 +85,15 @@ public class SpringShiroConfig {
 	public CacheManager shiroCacheManager(){
 		//shiro使用的缓存策略: 软引用, 内存满了之后缓存会被回收
 		return new MemoryConstrainedCacheManager();
+	}
+
+	@Bean
+	public RememberMeManager rememberMeManager() {
+		CookieRememberMeManager remember = new CookieRememberMeManager();
+		SimpleCookie cookie = new SimpleCookie("rememberMe");
+		cookie.setMaxAge(30);//单位秒
+		remember.setCookie(cookie);
+		return remember;
 	}
 
 }
