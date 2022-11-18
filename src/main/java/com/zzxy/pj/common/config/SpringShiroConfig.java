@@ -93,6 +93,7 @@ public class SpringShiroConfig {
 		SimpleCookie cookie = new SimpleCookie("rememberMe");
 		cookie.setMaxAge(30);//单位秒
 		remember.setCookie(cookie);
+		System.out.println();
 		return remember;
 	}
 
