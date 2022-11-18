@@ -21,8 +21,8 @@ import at.pollux.thymeleaf.shiro.dialect.ShiroDialect;
 @Configuration//当作配置文件类
 public class SpringShiroConfig {
 
-	/*//@Bean注解会把方法的返回值对象交给容器管理, id为方法名
-	@Bean
+	//@Bean注解会把方法的返回值对象交给容器管理, id为方法名
+	/*@Bean
 	public SecurityManager securityManager() {
 		return new DefaultWebSecurityManager();
 	}*/
@@ -48,16 +48,16 @@ public class SpringShiroConfig {
 		map.put("/plugins/**","anon");
 		map.put("/user/doLogin","anon");
 		//配置退出登录路径
-		map.put("/doLoginOut", "logout");//logout表示退出
+		map.put("/doLoginOut", "logout");
 		//除了匿名访问的资源,其它都要认证("authc")后访问
-		map.put("/**","user");//记住我功能一定要改成user
+		map.put("/**","user");
 		//设置到shiro的过滤器中
 		shiroFilter.setFilterChainDefinitionMap(map);
 		return shiroFilter;
 	}
 
 	@Bean
-	public SecurityManager securityManager(Realm realm, CacheManager cacheManager, RememberMeManager rememberMeManager) {
+	public SecurityManager securityManager(Realm realm, CacheManager cacheManager,RememberMeManager rememberMeManager) {
 		DefaultWebSecurityManager sManager = new DefaultWebSecurityManager();
 		sManager.setRealm(realm);
 		sManager.setCacheManager(cacheManager);
@@ -86,15 +86,13 @@ public class SpringShiroConfig {
 		//shiro使用的缓存策略: 软引用, 内存满了之后缓存会被回收
 		return new MemoryConstrainedCacheManager();
 	}
-
 	@Bean
 	public RememberMeManager rememberMeManager() {
 		CookieRememberMeManager remember = new CookieRememberMeManager();
 		SimpleCookie cookie = new SimpleCookie("rememberMe");
 		cookie.setMaxAge(30);//单位秒
 		remember.setCookie(cookie);
-		System.out.println("陈");
+		System.out.println("何");
 		return remember;
 	}
-
 }
