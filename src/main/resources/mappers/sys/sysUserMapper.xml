@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zzxy.pj.sys.dao.SysUserDao">
+
+	<select id="countAllUser" resultType="int">
+		select count(1) from sys_users
+		<where>
+			<if test="username != null">
+				username like concat("%", #{username}, "%")
+			</if>
+		</where>
+	</select>
+	
+	<select id="findUserDeptVo" resultMap="sysUserDeptVo">
+		select * from sys_users
+		<where>
+			<if test="username != null and username != ''">
+				username like concat("%", #{username}, "%")
+			</if>
+		</where>
+		limit #{start}, #{pageSize}
+	</select>
+
+	<resultMap type="com.zzxy.pj.sys.vo.SysUserDeptVo" id="sysUserDeptVo">
+		<association property="sysDept" column="deptId" select="com.zzxy.pj.sys.dao.SysDeptDao.findDeptById"></association>
+	</resultMap>
+	
+	<select id="findUserByName" resultType="com.zzxy.pj.sys.entity.SysUser">
+		select * from sys_users where username = #{username}
+	</select>
+	
+	<insert id="insertUser" keyProperty="id" parameterType="com.zzxy.pj.sys.entity.SysUser" useGeneratedKeys="true" >
+		  insert into sys_users (username,password,deptId,email,mobile,salt,valid,createdTime,modifiedTime,createdUser,modifiedUser)
+      values(#{username},#{password},#{deptId},#{email},#{mobile},#{salt},#{valid},now(),now(),#{createdUser},#{modifiedUser})
+	</insert>
+	
+	<update id="updateUser">
+		update sys_users 
+		<set>
+			<if test="deptId != null">
+				deptId = #{deptId},
+			</if>
+			<if test="email != null">
+				email = #{email},
+			</if>
+			<if test="mobile != null">
+				mobile = #{mobile},
+			</if>
+			modifiedTime = now()
+			where id = #{id}
+		</set>
+	</update>
+</mapper>

@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zzxy.pj.sys.dao.SysDeptDao">
+	<select id="findDeptById" resultType="com.zzxy.pj.sys.entity.SysDept">
+		select * from sys_depts where id = #{id}
+	</select>
+	
+	<select id="findDeptVo" resultType="com.zzxy.pj.sys.vo.SysDeptVo">
+		select d.id, d.name, d.parentId, p.name parentName, d.sort, d.note from sys_depts d left join sys_depts p
+		on d.parentId = p.id
+	</select>
+	
+	<select id="findDeptByName" resultType="com.zzxy.pj.sys.entity.SysDept">
+		select * from sys_depts where name = #{name}
+	</select>
+	
+	<insert id="saveDept">
+		insert into sys_depts values(#{id}, #{name}, #{parentId}, #{sort}, #{note},
+		now(), now(), null, null);
+	</insert>
+	
+	<select id="findDeptByIdName" resultType="com.zzxy.pj.sys.entity.SysDept">
+		select * from sys_depts where name = #{name} and id != #{id}
+	</select>
+	
+	<update id="updateDept">
+		update sys_depts
+		<set>
+			<if test="name != null || name != ''">
+				name = #{name},
+			</if>
+			<if test="parentId != null || parentId != ''">
+				parentId = #{parentId},
+			</if>
+			<if test="sort != null || sort != ''">
+				sort = #{sort},
+			</if>
+			<if test="note != null || note != ''">
+				note = #{note},
+			</if>
+			modifiedTime = now() where id = #{id}
+		</set>
+	</update>
+	
+	<delete id="deleteDept">
+		delete from sys_depts where id = #{id}
+	</delete>
+	
+	<update id="changeUserDeptId">
+		update sys_users set deptId = 0 where deptId = #{id}
+	</update>
+	
+</mapper>

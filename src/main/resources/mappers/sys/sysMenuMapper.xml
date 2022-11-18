@@ -1,0 +1,106 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.zzxy.pj.sys.dao.SysMenuDao">
+
+	<!-- 开启二级缓存
+		mybatis先执行二级缓存, 再执行一级缓存
+		二级缓存的处理类: CachingExecutor
+		一级缓存的处理类: BaseExcutor
+				查询方法都是query()
+		二级缓存实现了:
+			线程安全: SynchronizedCache
+			日志打印(比如缓存击中概率): LogginCache
+			序列化: SerializedCache
+			拒绝算法: 默认LruCache(去掉最近最少的)
+						FIFO算法(去掉最老的)
+						SOFT: 软引用
+						WEAK: 弱引用
+			readOnly: 只读, 默认为false时, 
+						配置为false时,缓存中存入的不是对象, 而是序列化后的字节
+					  取出来变成对象时, 所以每次缓存取出来的对象不是同一个
+					  	配置为true时, 缓存中存入的是对象的引用,
+					  取出来是同一个对象
+			size: 缓存个数
+			flushInterval: 定时清空缓存, 单位毫秒
+		二级缓存与命名空间绑定在一起
+		提问: 当MenuMapper.xml中某条sql有resultMap标签, 关联了其他
+				XML的sql, 其他XML的缓存会不会刷新?
+			不会
+		当增删改时, 默认缓存会刷新
+	 -->
+	<cache flushInterval="60000" eviction="FIFO"/>
+	<!-- 
+		系统管理
+			菜单管理
+				删除
+				添加
+			日志管理
+		left join : 左边全部显示, 右边没有关联数据补null;right相反
+	 -->
+	<select id="findObjects" resultType="map">
+		select c.*, p.name parentName from sys_menus c left join sys_menus p
+		on c.parentId = p.id
+	</select>
+	<!-- <select id="findObjects" resultType="map">
+		select c.*,(select name from sys_menus p where p.id = c.parentId)from sys_menus c
+	</select> -->
+	
+	<!-- 根据菜单id找儿子的数量 -->
+	<select id="getCountChildByMenuId" resultType="int">
+		select count(1) c from sys_menus where parentId = #{menuId}
+	</select>
+	
+	<!-- 根据id删除菜单 -->
+	<delete id="deleteMenuById">
+		delete from sys_menus where id = #{menuId}
+	</delete>
+	
+	<select id="findZtreeMenuNode" resultType="com.zzxy.pj.common.entity.Node">
+		select id, name,parentId from sys_menus
+	</select>
+	
+	<insert id="insertMenu">
+		insert into sys_menus values(#{id}, #{name}, #{url}, #{type}, #{sort}, null, #{parentId},
+		#{permission}, now(), now(), null, null);
+	</insert>
+	
+	<update id="updateMenu">
+		update sys_menus
+		<set>
+			<if test="name != null">
+				name = #{name},
+			</if>
+			<if test="url != null">
+				url = #{url},
+			</if>
+			<if test="type != null">
+				type = #{type},
+			</if>
+			<if test="sort != null">
+				sort = #{sort},
+			</if>
+			<if test="parentId != null">
+				parentId = #{parentId},
+			</if>
+			<if test="permission != null">
+				permission = #{permission},
+			</if>
+			createdTime = now()
+			where id = #{id}
+		</set>
+	</update>
+	
+	<select id="findPermissions" resultType="String">
+		select permission  from sys_menus where id in
+		<foreach collection="array" open="(" close=")" separator="," item="id">
+			#{id}
+		</foreach>
+	</select>
+	
+	<select id="findPermissionsByUserId" resultType="String">
+		select distinct permission from sys_menus menu join sys_role_menus rm on menu.id = rm.menu_id
+		join sys_user_roles ur on ur.role_id = rm.role_id 
+		join sys_users user on user.id = ur.user_id where user.id = #{userId}
+	</select>
+</mapper>

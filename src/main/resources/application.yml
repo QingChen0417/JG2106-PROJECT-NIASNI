@@ -1,0 +1,55 @@
+#server
+server:
+  port: 80
+  servlet:
+    context-path: /
+  tomcat:
+    threads: 
+      max: 1000
+      min-spare: 30
+    url-encoding: utf-8
+
+#mybatis
+mybatis:
+  configuration:
+    map-underscore-to-camel-case: true
+    default-statement-timeout: 30
+  mapper-locations:
+  - classpath:/mappers/*/*.xml
+
+#log
+logging: 
+  level: 
+    '[com.zzxy]': DEBUG
+
+#spring
+spring:
+  datasource:
+    url: jdbc:mysql:///jtsys?serverTimezone=GMT%2B8
+    username: root
+    password: root
+    type: com.alibaba.druid.pool.DruidDataSource
+  thymeleaf:
+    prefix: classpath:/templates/pages/
+    suffix: .html
+    cache: false
+  aop:
+    proxy-target-class: false
+  task:
+    execution:
+      pool:
+        core-size: 17 #核心线程
+        max-size: 500 #最大线程
+        queue-capactity: 200  #队列容量
+        allow-core-thread-timeout: false #核心线程超时是否销毁
+        keep-alive: 30  #活着的时间,默认为秒
+      thread-name-prefix: zz-pool-thread- #自定义线程名前缀
+      
+pagehelper:
+   helper-dialect: mysql #指定方言为mysql
+   reasonable: true #分页查询合理化(当前页>最大页 为最大页(<0为1))
+
+com:
+  zzxy:
+    page:
+      page-size: 5 #每页条数默认为5

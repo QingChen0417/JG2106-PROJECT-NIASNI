@@ -1,0 +1,143 @@
+<div class="row">
+	<div class="col-xs-12">
+		<div class="box">
+			<div class="box-header">
+				<h3 class="box-title">用户管理</h3>
+
+				<div class="box-tools">
+					<div class="input-group input-group-sm" style="width: 350px;">
+						<input type="text" name="table_search" id="searchNameId"
+							class="form-control pull-right" placeholder="用户名">
+
+						<div class="input-group-btn">
+							<button type="button" class="btn btn-default btn-search">
+                                <i class="fa fa-search"></i>
+							</button>
+							<button type="button" class="btn btn-default btn-add">添加</button>
+							<button type="button" class="btn btn-default btn-update">修改</button>
+						</div>
+					</div>
+				</div>
+			</div>
+			<!-- /.box-header -->
+			<div class="box-body table-responsive no-padding">
+				<table class="table table-hover">
+					<thead>
+						<tr>
+							<th>ID</th>
+							<th>用户名</th>
+							<th>部门</th>
+							<th>邮箱</th>
+							<th>手机号</th>
+							<th>状态</th>
+							<th>创建时间</th>
+							<th>修改时间</th>
+							<th>操作</th>
+						</tr>
+					</thead>
+					<tbody id="tbodyId"></tbody>
+				</table>
+			</div>
+			<div id="pageId" class="box-footer clearfix">
+			</div>
+			<!-- /.box-body -->
+		</div>
+		<!-- /.box -->
+	</div>
+</div>
+<script type="text/javascript">
+   $(function() {
+	   //先加载分页, 再查询数据
+	   $("#pageId").load("doPageUI", function() {
+		   doGetObjects();
+		   $(".btn-search").on("click", doGetObjects);
+		   //$(".btn-valid").on("click", changeValid);
+		   $(".input-group-btn").on("click", ".btn-add, .btn-update", saveUserUI);
+	   });
+   })
+   
+   //页面加载完成异步加载当前页数据
+   function doGetObjects(){
+	   var url="user/findUserDeptVo";
+	   var curPage = $("#pageId").data("curPage");
+	   var params = {
+			   	"username" : $("#searchNameId").val().trim(),
+			   	"curPage":curPage ? curPage : 1,
+			   	"pageSize" : 6};
+	   $.get(url, params, function(result) {
+		   if(result.state == 1) {
+			   //填充数据
+			   loadUserData(result.data.pageData);
+			   //分页
+			   setPageData(result.data);
+ 		   } else {
+ 			   alert(result.message);
+ 		   }
+	   })
+   }
+
+   //通过服务端返回的数据初始化页面
+   function loadUserData(data){
+	  //1.获取tbody对象，并清空内容
+	  var tBody=$("#tbodyId");
+	  tBody.empty();
+	  //2.迭代data内容将数据追加到tbody中
+	  for(var i in data){
+		  var tr = doCreateTr(data[i]);
+		  tBody.append(tr);
+		  //每一行上面绑定当前行数据
+		  tBody.find("tr:last").data("userRow", data[i]);
+	  }
+   }
+   
+   function saveUserUI() {
+	   var bool = $(this).hasClass("btn-update");
+	   var title = bool ? "修改用户" : "添加用户";
+	   if(bool) {
+		   var radioCheck = $("#tbodyId input[type='radio']:checked");
+		   if(!radioCheck.length) {
+			   alert("请选择要修改的数据");
+			   return;
+		   }
+		   $("#mainContentId").data("userId", radioCheck.val());
+		   //拿到行数据绑定到大盒子上, 为了修改页面能拿到数据
+		   $("#mainContentId").data("userRow", radioCheck.parents("tr").data("userRow"));
+	   }
+	   $("#mainContentId").load("user/user_edit", function() {
+		   $(".box-title").text(title);
+	   });
+   }
+   
+   function changeValid(btn) {
+	   //找到当前行的id
+	   var id = $(btn).parents("tr").data("userRow").id;
+	   var valid = $(btn).text() == '启用' ? 1 : 0;
+	   var url = "user/updateValid";
+	   var params = {id : id, valid : valid};
+	   $.get(url, params, function(result) {
+		   if(result.state == 1) {
+			   alert(result.data);
+			   doGetObjects();
+		   } else {	
+			   alert(result.message);
+		   }
+	   })
+   }
+   
+   function doCreateTr(row){
+	   var tr="<tr><td><input type='radio' name='radioId' value='" + row.id + "'></td>"+
+	     "<td>" + row.username + "</td>"+
+	     "<td>" + (row.sysDept ? row.sysDept.name:'未分配') + "</td>"+
+	     "<td>" + row.email + "</td>"+
+	     "<td>" + row.mobile + "</td>"+
+	     "<td>" + (row.valid ? "启用" : "禁用") + "</td>"+
+	     "<td>" + new Date(row.createdTime).toLocaleString() + "</td>"+
+	     "<td>" + new Date(row.modifiedTime).toLocaleString() + "</td>"+
+	     "<td><button type='button' class='btn btn-default btn-valid' onclick='changeValid(this)'>" + (row.valid ? "禁用" : "启用") + "</button></td></tr>"; 
+       return tr;
+   }
+</script>
+
+
+
+
