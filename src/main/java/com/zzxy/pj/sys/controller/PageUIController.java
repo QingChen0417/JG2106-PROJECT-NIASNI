@@ -1,7 +1,9 @@
 package com.zzxy.pj.sys.controller;
 
+import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
+import com.zzxy.pj.common.util.ShiroUtil;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -39,8 +41,9 @@ public class PageUIController {
 	}
 	
 	@RequestMapping("doIndexUI")
-	public String pageUI() {
+	public String pageUI(Map<String, Object> map) {
 		times.incrementAndGet();//加1的方法
+		map.put("user", ShiroUtil.getUsername());
 		return "starter";
 	}
 	
