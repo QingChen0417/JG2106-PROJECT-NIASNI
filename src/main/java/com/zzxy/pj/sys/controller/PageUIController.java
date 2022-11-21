@@ -1,10 +1,17 @@
 package com.zzxy.pj.sys.controller;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.atomic.AtomicLong;
 
 import com.zzxy.pj.common.util.ShiroUtil;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -56,4 +63,22 @@ public class PageUIController {
 	public String doLoginUI() {
 		return "login";
 	}
+
+	@RequestMapping("base/base_list")
+	public String doBaseUI(Model model) {
+		//模拟数据
+		List<Item> data = new ArrayList<>();
+		data.add(new Item(1,"足球","体育"));
+		data.add(new Item(1,"动画片","动漫"));
+		model.addAttribute("list",data);
+		return "sys/base_list";
+	}
+}
+@Data
+@NoArgsConstructor
+@AllArgsConstructor
+class Item implements Serializable{
+	private int id;
+	private String name;
+	private String type;
 }
