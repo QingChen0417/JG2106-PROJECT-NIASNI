@@ -2,9 +2,9 @@
     <table class="table table-hover">
         <!--  th:each表示遍历   th:id表示id属性 th:value表示value属性 th:text表示文本 m:表示变量,可以理解为: m = new Item(id,name,type); ${list}表示后台绑定的值,如model.addAttribute("list",data); -->
         <tr th:each="m:${list}">
-            <td th:id="m.id" th:text="m.id"></td>
-            <td th:text="m.name"></td>
-            <td th:text="m.type"></td>
+            <td th:id="${m.id}" th:text="${m.id}"></td>
+            <td th:text="${m.name}"></td>
+            <td th:text="${m.type}"></td>
         </tr>
     </table>
 </div>
