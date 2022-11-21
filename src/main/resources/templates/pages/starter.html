@@ -267,7 +267,7 @@ desired effect
          </span>
         </a>       
         <ul class="treeview-menu">
-            <li><a id="load-base-id">基本管理</a></li>
+            <li><a id="load-base-id" onclick="doBaseUI()">基本管理</a></li>
             <li><a id="load-type-id">类目管理</a></li>
             <li><a id="load-brand-id">品牌管理</a></li>
             <li><a id="load-attr-id">属性管理</a></li>
@@ -474,6 +474,10 @@ desired effect
 			$("#mainContentId").load(url);
 		});
 	}
+    function doBaseUI() {
+      var url = "base/base_list";
+      $("#mainContentId").load(url);
+    }
 </script>
 </body>
 </html>
