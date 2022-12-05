@@ -49,4 +49,9 @@ public class GlobalExceptionHandler {
 		e.printStackTrace();
 		return r;
 	}
+	//时间异常处理
+	@ExceptionHandler(TimeHandlerException.class)
+	public JsonResult handlerTimeException(TimeHandlerException e) {
+		return new JsonResult(e);
+	}
 }
